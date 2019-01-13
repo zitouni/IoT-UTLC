@@ -1,0 +1,762 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+chan touchA, touchB, untouch, end;
+
+/* Controller &lt;-&gt; Cloud actions */
+broadcast chan cReqAR, cReqAG, cReqBR, cReqBG, confirmA, confirmB; //Broadcast for sending to the diffent variables of the topic
+chan confirmAt, confirmBt;
+
+/* Trafficlights &lt;-&gt; Controller actions */
+broadcast chan signalAR, signalAG, signalBR, signalBG, signal, reqAG, reqAR, reqBG, reqBR, start;
+
+/* Trafficlights master &lt;-&gt; slave actions */
+chan slaveAG, slaveAR, slaveBR, slaveBG;
+
+/* Globals for cloud values */
+int lightA = 2; 
+int lightB = 0;
+//bool blockingState = false;
+bool inCycle = false;</declaration>
+	<template>
+		<name>TemplateTrafLight</name>
+		<parameter>int p</parameter>
+		<declaration>clock x;
+int light = 2;
+int test = 0;
+bool blockingState=false;
+</declaration>
+		<location id="id0" x="0" y="-603">
+			<name x="-10" y="-637">RED</name>
+		</location>
+		<location id="id1" x="323" y="-620">
+			<name x="313" y="-654">YELLOW</name>
+		</location>
+		<location id="id2" x="195" y="-773">
+			<committed/>
+		</location>
+		<location id="id3" x="-170" y="-459">
+			<name x="-180" y="-493">GREEN</name>
+		</location>
+		<location id="id4" x="-425" y="-476">
+		</location>
+		<location id="id5" x="-136" y="-832">
+			<name x="-170" y="-858">CLK</name>
+			<label kind="invariant" x="-204" y="-824">x&lt;=60</label>
+		</location>
+		<location id="id6" x="-238" y="-1096">
+		</location>
+		<init ref="id6"/>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id0"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="42" y="-824">signalAR?</label>
+			<label kind="assignment" x="42" y="-850">x=0</label>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-407" y="-671">signalAG?</label>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-595" y="-918">x &gt;= 60 and light == 0 &amp;&amp; blockingState == false &amp;&amp; inCycle == false</label>
+			<label kind="synchronisation" x="-408" y="-935">reqAG!</label>
+			<label kind="assignment" x="-493" y="-892">x=0, blockingState=true</label>
+			<nail x="-323" y="-985"/>
+			<nail x="-374" y="-816"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-42" y="-1062">x&gt;=60 &amp;&amp; light==2 &amp;&amp; blockingState == false &amp;&amp; inCycle == false</label>
+			<label kind="synchronisation" x="-41" y="-1037">reqAR!</label>
+			<label kind="assignment" x="-42" y="-1011">blockingState=true</label>
+			<nail x="-25" y="-1174"/>
+			<nail x="59" y="-969"/>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id1"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-118" y="-734">confirmAt!</label>
+			<label kind="assignment" x="-118" y="-752">x=0,blockingState=false, light=0</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id5"/>
+			<label kind="assignment" x="-153" y="-561">x=0,blockingState=false, inCycle=false</label>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="-323" y="-459">slaveAG!</label>
+			<label kind="assignment" x="-365" y="-433">light=2</label>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id5"/>
+			<label kind="synchronisation" x="-212" y="-1079">start!</label>
+			<label kind="assignment" x="-212" y="-1062">x=0</label>
+		</transition>
+	</template>
+	<template>
+		<name>TemplateTrafLight2</name>
+		<parameter>int p</parameter>
+		<declaration>clock x;
+int light = 0;
+int test = 0;
+bool blockingState = false;
+</declaration>
+		<location id="id7" x="-136" y="-832">
+			<name x="-170" y="-858">CLK</name>
+			<label kind="invariant" x="-204" y="-824">x&lt;=60</label>
+		</location>
+		<location id="id8" x="17" y="-799">
+			<committed/>
+		</location>
+		<location id="id9" x="-374" y="-722">
+		</location>
+		<location id="id10" x="102" y="-663">
+			<name x="92" y="-697">RED</name>
+		</location>
+		<location id="id11" x="195" y="-705">
+			<name x="185" y="-739">YELLOW</name>
+		</location>
+		<location id="id12" x="-323" y="-629">
+			<name x="-333" y="-663">GREEN</name>
+		</location>
+		<location id="id13" x="-238" y="-1096">
+		</location>
+		<init ref="id13"/>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id10"/>
+			<label kind="assignment" x="136" y="-671">test=0</label>
+		</transition>
+		<transition>
+			<source ref="id13"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-255" y="-1045">start?</label>
+			<label kind="assignment" x="-246" y="-1020">x=0</label>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="-68" y="-833">signalBR?</label>
+			<label kind="assignment" x="-85" y="-850">x=0</label>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="-374" y="-773">signalBG?</label>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-714" y="-901">x==60 &amp;&amp; light == 0 &amp;&amp; blockingState == false &amp;&amp; inCycle == false</label>
+			<label kind="synchronisation" x="-297" y="-875">reqBG!</label>
+			<label kind="assignment" x="-425" y="-850">x=0, blockingState=true</label>
+			<nail x="-263" y="-943"/>
+			<nail x="-289" y="-824"/>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id7"/>
+			<label kind="guard" x="-93" y="-977">x==60 &amp;&amp; light==2 &amp;&amp; blockingState == false &amp;&amp; inCycle == false</label>
+			<label kind="synchronisation" x="-93" y="-952">reqBR!</label>
+			<label kind="assignment" x="-93" y="-935">x=0, blockingState=true</label>
+			<nail x="-102" y="-1011"/>
+			<nail x="-17" y="-926"/>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id11"/>
+		</transition>
+		<transition>
+			<source ref="id10"/>
+			<target ref="id7"/>
+			<label kind="synchronisation" x="-25" y="-739">confirmBt!</label>
+			<label kind="assignment" x="-118" y="-752">x=0, blockingState=false,light=0</label>
+		</transition>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id7"/>
+			<label kind="assignment" x="-348" y="-722">x=0, blockingState=false, inCycle = false</label>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id12"/>
+			<label kind="synchronisation" x="-425" y="-680">slaveBG!</label>
+			<label kind="assignment" x="-416" y="-697">light=2</label>
+		</transition>
+	</template>
+	<template>
+		<name>TemplateCtrl</name>
+		<declaration>int lightActl = 0;
+int lightBctl = 0;</declaration>
+		<location id="id14" x="187" y="42">
+		</location>
+		<location id="id15" x="-323" y="68">
+		</location>
+		<location id="id16" x="-357" y="0">
+		</location>
+		<location id="id17" x="-119" y="314">
+		</location>
+		<location id="id18" x="8" y="314">
+		</location>
+		<location id="id19" x="-161" y="229">
+		</location>
+		<location id="id20" x="93" y="238">
+		</location>
+		<location id="id21" x="68" y="25">
+		</location>
+		<location id="id22" x="-195" y="25">
+		</location>
+		<location id="id23" x="229" y="348">
+		</location>
+		<location id="id24" x="-297" y="365">
+		</location>
+		<location id="id25" x="-357" y="0">
+		</location>
+		<location id="id26" x="246" y="-25">
+		</location>
+		<location id="id27" x="408" y="314">
+		</location>
+		<location id="id28" x="-484" y="340">
+		</location>
+		<location id="id29" x="-467" y="-119">
+		</location>
+		<location id="id30" x="340" y="-119">
+		</location>
+		<location id="id31" x="280" y="-238">
+		</location>
+		<location id="id32" x="-518" y="246">
+		</location>
+		<location id="id33" x="-484" y="144">
+		</location>
+		<location id="id34" x="-382" y="-229">
+		</location>
+		<location id="id35" x="-178" y="-229">
+		</location>
+		<location id="id36" x="68" y="-238">
+		</location>
+		<location id="id37" x="467" y="229">
+		</location>
+		<location id="id38" x="493" y="153">
+		</location>
+		<location id="id39" x="-51" y="51">
+		</location>
+		<location id="id40" x="-51" y="-348">
+		</location>
+		<init ref="id40"/>
+		<transition>
+			<source ref="id14"/>
+			<target ref="id21"/>
+			<label kind="synchronisation" x="86" y="16">confirmBt?</label>
+		</transition>
+		<transition>
+			<source ref="id26"/>
+			<target ref="id14"/>
+			<label kind="synchronisation" x="216" y="-9">slaveAG!</label>
+		</transition>
+		<transition>
+			<source ref="id15"/>
+			<target ref="id22"/>
+			<label kind="synchronisation" x="-305" y="29">confirmAt?</label>
+		</transition>
+		<transition>
+			<source ref="id25"/>
+			<target ref="id15"/>
+			<label kind="synchronisation" x="-340" y="17">slaveBG!</label>
+		</transition>
+		<transition>
+			<source ref="id17"/>
+			<target ref="id19"/>
+			<label kind="synchronisation" x="-140" y="254">confirmBt?</label>
+		</transition>
+		<transition>
+			<source ref="id24"/>
+			<target ref="id17"/>
+			<label kind="synchronisation" x="-279" y="322">slaveBR!</label>
+		</transition>
+		<transition>
+			<source ref="id18"/>
+			<target ref="id20"/>
+			<label kind="synchronisation" x="59" y="280">confirmAt?</label>
+		</transition>
+		<transition>
+			<source ref="id23"/>
+			<target ref="id18"/>
+			<label kind="synchronisation" x="93" y="340">slaveAR!</label>
+		</transition>
+		<transition>
+			<source ref="id20"/>
+			<target ref="id39"/>
+			<label kind="synchronisation" x="51" y="161">signalBG!</label>
+		</transition>
+		<transition>
+			<source ref="id19"/>
+			<target ref="id39"/>
+			<label kind="synchronisation" x="-110" y="161">signalAG!</label>
+		</transition>
+		<transition>
+			<source ref="id21"/>
+			<target ref="id39"/>
+			<label kind="synchronisation" x="-33" y="17">signalAG!</label>
+		</transition>
+		<transition>
+			<source ref="id22"/>
+			<target ref="id39"/>
+			<label kind="synchronisation" x="-153" y="17">signalBG!</label>
+		</transition>
+		<transition>
+			<source ref="id27"/>
+			<target ref="id23"/>
+			<label kind="synchronisation" x="280" y="357">signalAR!</label>
+			<label kind="assignment" x="280" y="374">lightActl = lightA, lightBctl = lightB, inCycle = true</label>
+		</transition>
+		<transition>
+			<source ref="id28"/>
+			<target ref="id24"/>
+			<label kind="synchronisation" x="-484" y="374">signalBR!</label>
+			<label kind="assignment" x="-484" y="391">lightActl = lightA, lightBctl = lightB, inCycle = true</label>
+		</transition>
+		<transition>
+			<source ref="id29"/>
+			<target ref="id25"/>
+			<label kind="synchronisation" x="-518" y="-76">signalAR!</label>
+			<label kind="assignment" x="-688" y="-51">lightActl = lightA, lightBctl = lightB, inCycle=true</label>
+		</transition>
+		<transition>
+			<source ref="id30"/>
+			<target ref="id26"/>
+			<label kind="synchronisation" x="246" y="-110">signalBR!</label>
+			<label kind="assignment" x="246" y="-93">lightActl = lightA, lightBctl = lightB, inCycle = true</label>
+		</transition>
+		<transition>
+			<source ref="id37"/>
+			<target ref="id27"/>
+			<label kind="synchronisation" x="459" y="280">confirmA?</label>
+		</transition>
+		<transition>
+			<source ref="id32"/>
+			<target ref="id28"/>
+			<label kind="synchronisation" x="-586" y="289">confirmB?</label>
+		</transition>
+		<transition>
+			<source ref="id34"/>
+			<target ref="id29"/>
+			<label kind="synchronisation" x="-510" y="-212">confirmB?</label>
+		</transition>
+		<transition>
+			<source ref="id31"/>
+			<target ref="id30"/>
+			<label kind="synchronisation" x="229" y="-187">confirmA?</label>
+		</transition>
+		<transition>
+			<source ref="id36"/>
+			<target ref="id31"/>
+			<label kind="synchronisation" x="161" y="-263">cReqAG!</label>
+		</transition>
+		<transition>
+			<source ref="id33"/>
+			<target ref="id32"/>
+			<label kind="synchronisation" x="-569" y="187">cReqBR!</label>
+		</transition>
+		<transition>
+			<source ref="id39"/>
+			<target ref="id33"/>
+			<label kind="synchronisation" x="-289" y="110">reqBR?</label>
+			<label kind="assignment" x="-466" y="97">inCycle=true</label>
+		</transition>
+		<transition>
+			<source ref="id38"/>
+			<target ref="id37"/>
+			<label kind="synchronisation" x="493" y="187">cReqAR!</label>
+		</transition>
+		<transition>
+			<source ref="id39"/>
+			<target ref="id38"/>
+			<label kind="synchronisation" x="204" y="68">reqAR?</label>
+			<label kind="assignment" x="68" y="102">inCycle = true</label>
+		</transition>
+		<transition>
+			<source ref="id39"/>
+			<target ref="id36"/>
+			<label kind="synchronisation" x="-34" y="-161">reqAG?</label>
+			<label kind="assignment" x="-33" y="-93">inCycle = true</label>
+		</transition>
+		<transition>
+			<source ref="id35"/>
+			<target ref="id34"/>
+			<label kind="synchronisation" x="-306" y="-255">cReqBG!</label>
+		</transition>
+		<transition>
+			<source ref="id39"/>
+			<target ref="id35"/>
+			<label kind="synchronisation" x="-136" y="-161">reqBG?</label>
+			<label kind="assignment" x="-160" y="-89">inCycle=true</label>
+		</transition>
+		<transition>
+			<source ref="id40"/>
+			<target ref="id39"/>
+			<label kind="synchronisation" x="-51" y="-13">start?</label>
+		</transition>
+	</template>
+	<template>
+		<name>TrafficLightSlave</name>
+		<declaration>clock xs;</declaration>
+		<location id="id41" x="-314" y="272">
+			<name x="-382" y="263">GREEN</name>
+		</location>
+		<location id="id42" x="-119" y="170">
+			<name x="-93" y="161">YELLOW</name>
+			<label kind="invariant" x="-129" y="187">xs&lt;=3</label>
+		</location>
+		<location id="id43" x="-365" y="-119">
+			<name x="-416" y="-128">RED</name>
+		</location>
+		<init ref="id43"/>
+		<transition>
+			<source ref="id43"/>
+			<target ref="id43"/>
+			<label kind="synchronisation" x="-347" y="-170">slaveAR?</label>
+			<nail x="-297" y="-187"/>
+			<nail x="-187" y="-136"/>
+		</transition>
+		<transition>
+			<source ref="id41"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-636" y="187">slaveAG?</label>
+			<nail x="-654" y="136"/>
+			<nail x="-544" y="331"/>
+		</transition>
+		<transition>
+			<source ref="id42"/>
+			<target ref="id43"/>
+			<label kind="guard" x="-229" y="0">xs&gt;=3</label>
+			<label kind="assignment" x="-229" y="-34">xs=0</label>
+		</transition>
+		<transition>
+			<source ref="id43"/>
+			<target ref="id41"/>
+			<label kind="synchronisation" x="-442" y="76">slaveAG?</label>
+		</transition>
+		<transition>
+			<source ref="id41"/>
+			<target ref="id42"/>
+			<label kind="synchronisation" x="-212" y="255">slaveAR?</label>
+			<label kind="assignment" x="-212" y="229">xs=0</label>
+		</transition>
+	</template>
+	<template>
+		<name>TrafficLightSlave2</name>
+		<declaration>clock xs2;</declaration>
+		<location id="id44" x="-314" y="272">
+			<name x="-382" y="263">GREEN</name>
+		</location>
+		<location id="id45" x="-119" y="170">
+			<name x="-93" y="161">YELLOW</name>
+			<label kind="invariant" x="-129" y="187">xs2&lt;=3</label>
+		</location>
+		<location id="id46" x="-365" y="-195">
+			<name x="-416" y="-204">RED</name>
+		</location>
+		<init ref="id46"/>
+		<transition>
+			<source ref="id44"/>
+			<target ref="id44"/>
+			<label kind="synchronisation" x="-373" y="323">slaveBG?</label>
+			<nail x="-391" y="408"/>
+			<nail x="-561" y="263"/>
+		</transition>
+		<transition>
+			<source ref="id46"/>
+			<target ref="id46"/>
+			<label kind="synchronisation" x="-347" y="-280">slaveBR?</label>
+			<nail x="-229" y="-331"/>
+			<nail x="-153" y="-212"/>
+		</transition>
+		<transition>
+			<source ref="id45"/>
+			<target ref="id46"/>
+			<label kind="guard" x="-246" y="-93">xs2&gt;=3</label>
+			<label kind="assignment" x="-246" y="-119">xs2=0</label>
+		</transition>
+		<transition>
+			<source ref="id46"/>
+			<target ref="id44"/>
+			<label kind="synchronisation" x="-442" y="76">slaveBG?</label>
+		</transition>
+		<transition>
+			<source ref="id44"/>
+			<target ref="id45"/>
+			<label kind="synchronisation" x="-212" y="255">slaveBR?</label>
+			<label kind="assignment" x="-212" y="229">xs2=0</label>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">Remote</name>
+		<declaration>// Place local declarations here.</declaration>
+		<location id="id47" x="178" y="0">
+			<name x="204" y="-8">TOUCHED</name>
+			<urgent/>
+		</location>
+		<location id="id48" x="0" y="0">
+			<name x="-51" y="-8">IDLE</name>
+			<label kind="exponentialrate" x="-10" y="34">1:4</label>
+		</location>
+		<branchpoint id="id49" x="-59" y="-119">
+		</branchpoint>
+		<init ref="id48"/>
+		<transition>
+			<source ref="id49"/>
+			<target ref="id48"/>
+			<label kind="probability" x="-135" y="-140">2</label>
+			<nail x="-153" y="-161"/>
+			<nail x="-170" y="-8"/>
+			<nail x="-34" y="34"/>
+		</transition>
+		<transition>
+			<source ref="id48"/>
+			<target ref="id49"/>
+		</transition>
+		<transition>
+			<source ref="id49"/>
+			<target ref="id47"/>
+			<label kind="probability" x="-41" y="-182">1</label>
+			<nail x="93" y="-246"/>
+		</transition>
+		<transition>
+			<source ref="id47"/>
+			<target ref="id48"/>
+			<label kind="synchronisation" x="76" y="127">signalAG!</label>
+			<nail x="102" y="119"/>
+		</transition>
+		<transition>
+			<source ref="id48"/>
+			<target ref="id47"/>
+			<label kind="synchronisation" x="51" y="-144">touchA!</label>
+			<nail x="85" y="-119"/>
+		</transition>
+	</template>
+	<template>
+		<name>Remote2</name>
+		<location id="id50" x="178" y="0">
+			<name x="204" y="-8">TOUCHED</name>
+			<urgent/>
+		</location>
+		<location id="id51" x="0" y="0">
+			<name x="-51" y="-8">IDLE</name>
+		</location>
+		<init ref="id51"/>
+		<transition>
+			<source ref="id50"/>
+			<target ref="id51"/>
+			<label kind="synchronisation" x="76" y="127">signalBG!</label>
+			<nail x="102" y="119"/>
+		</transition>
+		<transition>
+			<source ref="id51"/>
+			<target ref="id50"/>
+			<label kind="synchronisation" x="51" y="-144">touchB!</label>
+			<nail x="85" y="-119"/>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">Cloud</name>
+		<declaration>// Place local declarations here.</declaration>
+		<location id="id52" x="110" y="365">
+			<committed/>
+		</location>
+		<location id="id53" x="85" y="-391">
+			<committed/>
+		</location>
+		<location id="id54" x="229" y="0">
+			<name x="255" y="-8">GREEN</name>
+		</location>
+		<location id="id55" x="0" y="0">
+			<name x="-59" y="-8">RED</name>
+		</location>
+		<init ref="id55"/>
+		<transition>
+			<source ref="id54"/>
+			<target ref="id53"/>
+			<label kind="synchronisation" x="247" y="-157">cReqAG?</label>
+			<label kind="assignment" x="247" y="-140">lightA=2</label>
+			<nail x="399" y="-280"/>
+		</transition>
+		<transition>
+			<source ref="id55"/>
+			<target ref="id52"/>
+			<label kind="synchronisation" x="-169" y="97">cReqAR?</label>
+			<label kind="assignment" x="-169" y="114">lightA=0</label>
+			<nail x="-187" y="229"/>
+		</transition>
+		<transition>
+			<source ref="id54"/>
+			<target ref="id52"/>
+			<label kind="synchronisation" x="476" y="127">cReqBG?</label>
+			<label kind="assignment" x="476" y="153">lightA=0</label>
+			<nail x="476" y="187"/>
+		</transition>
+		<transition>
+			<source ref="id52"/>
+			<target ref="id55"/>
+			<label kind="synchronisation" x="18" y="165">confirmA!</label>
+		</transition>
+		<transition>
+			<source ref="id54"/>
+			<target ref="id52"/>
+			<label kind="synchronisation" x="178" y="178">cReqAR?</label>
+			<label kind="assignment" x="178" y="204">lightA=0</label>
+		</transition>
+		<transition>
+			<source ref="id55"/>
+			<target ref="id53"/>
+			<label kind="synchronisation" x="-314" y="-161">cReqBR?</label>
+			<label kind="assignment" x="-314" y="-136">lightA=2</label>
+			<nail x="-280" y="-187"/>
+		</transition>
+		<transition>
+			<source ref="id53"/>
+			<target ref="id54"/>
+			<label kind="synchronisation" x="127" y="-357">confirmA!</label>
+		</transition>
+		<transition>
+			<source ref="id55"/>
+			<target ref="id53"/>
+			<label kind="synchronisation" x="-52" y="-233">cReqAG?</label>
+			<label kind="assignment" x="-51" y="-212">lightA=2</label>
+		</transition>
+		<transition>
+			<source ref="id54"/>
+			<target ref="id55"/>
+			<label kind="synchronisation" x="-17" y="51">untouch?</label>
+			<nail x="102" y="178"/>
+		</transition>
+		<transition>
+			<source ref="id55"/>
+			<target ref="id54"/>
+			<label kind="guard" x="76" y="-170">lightA==2</label>
+			<label kind="synchronisation" x="76" y="-195">touchA?</label>
+			<nail x="102" y="-136"/>
+		</transition>
+	</template>
+	<template>
+		<name>Cloud2</name>
+		<location id="id56" x="229" y="0">
+			<name x="255" y="-8">GREEN</name>
+		</location>
+		<location id="id57" x="127" y="195">
+			<committed/>
+		</location>
+		<location id="id58" x="0" y="0">
+			<name x="-59" y="-8">RED</name>
+		</location>
+		<location id="id59" x="102" y="-255">
+			<committed/>
+		</location>
+		<init ref="id58"/>
+		<transition>
+			<source ref="id56"/>
+			<target ref="id59"/>
+			<label kind="synchronisation" x="255" y="-238">cReqBG?</label>
+			<label kind="assignment" x="255" y="-221">lightB=2</label>
+			<nail x="297" y="-178"/>
+		</transition>
+		<transition>
+			<source ref="id57"/>
+			<target ref="id58"/>
+			<label kind="synchronisation" x="-136" y="102">cReqBR?</label>
+			<label kind="assignment" x="-144" y="119">lightB=0</label>
+			<nail x="-93" y="144"/>
+		</transition>
+		<transition>
+			<source ref="id56"/>
+			<target ref="id57"/>
+			<label kind="synchronisation" x="323" y="85">cReqAG?</label>
+			<label kind="assignment" x="323" y="102">lightB=0</label>
+			<nail x="348" y="144"/>
+		</transition>
+		<transition>
+			<source ref="id57"/>
+			<target ref="id58"/>
+			<label kind="synchronisation" x="0" y="93">confirmB!</label>
+		</transition>
+		<transition>
+			<source ref="id56"/>
+			<target ref="id57"/>
+			<label kind="synchronisation" x="187" y="93">cReqBR?</label>
+			<label kind="assignment" x="187" y="110">lightB=0</label>
+		</transition>
+		<transition>
+			<source ref="id58"/>
+			<target ref="id59"/>
+			<label kind="synchronisation" x="-144" y="-102">cReqAR?</label>
+			<label kind="assignment" x="-144" y="-76">lightB=2</label>
+			<nail x="-110" y="-153"/>
+		</transition>
+		<transition>
+			<source ref="id59"/>
+			<target ref="id56"/>
+			<label kind="synchronisation" x="161" y="-153">confirmB!</label>
+		</transition>
+		<transition>
+			<source ref="id58"/>
+			<target ref="id59"/>
+			<label kind="synchronisation" x="0" y="-170">cReqBG?</label>
+			<label kind="assignment" x="0" y="-153">lightB=2</label>
+		</transition>
+		<transition>
+			<source ref="id56"/>
+			<target ref="id58"/>
+			<label kind="synchronisation" x="76" y="34">untouch?</label>
+			<nail x="110" y="76"/>
+		</transition>
+		<transition>
+			<source ref="id58"/>
+			<target ref="id56"/>
+			<label kind="guard" x="76" y="-17">lightB==2</label>
+			<label kind="synchronisation" x="76" y="-59">touchB?</label>
+			<nail x="110" y="-34"/>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+t1 = TemplateTrafLight(0);
+t2 = TemplateTrafLight2(3);
+
+
+t1s = TrafficLightSlave();
+t2s = TrafficLightSlave2();
+
+//ctl1 = Controller();
+ctl1 = TemplateCtrl();
+
+//r1 = Remote();
+//r2 = Remote2();
+
+c1 = Cloud();
+c2 = Cloud2();
+// List one or more processes to be composed into a system.
+system t1, t2, t1s, t2s, ctl1, /*r1, r2,*/ c1, c2;
+    </system>
+	<queries>
+		<query>
+			<formula>A[] not deadlock
+			</formula>
+			<comment>
+			</comment>
+		</query>
+	</queries>
+</nta>
